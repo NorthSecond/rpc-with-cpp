@@ -8,3 +8,8 @@
  * @copyright Copyright (c) 2022
  * 
  */
+
+#include "RpcServer.hpp"
+
+using namespace std;
+

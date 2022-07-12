@@ -10,6 +10,7 @@
  */
 
 #include "skipList.hpp"
+#include <random>
 
 using namespace std;
 
@@ -51,8 +52,8 @@ int SkipList<T>::randomLevel()
 {
     int random_level = 1;
     int seed = time(NULL);
-    static default_random_engine e(seed);
-    static uniform_int_distribution<int> u(0, 1);
+    static std::default_random_engine e(seed);
+    static std::uniform_int_distribution<int> u(0, 1);
 
     while (u(e) && random_level < maxLevel)
     {
