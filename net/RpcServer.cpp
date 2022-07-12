@@ -1,25 +1,27 @@
 /**
  * @file RpcServer.cpp
  * @author your name (you@domain.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2022-07-12
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 
 #include "RpcServer.hpp"
 #include "murmurhash3.h"
+#include "HttpServer.hpp"
 
 using namespace std;
 
-bool RpcServer::RegisterService(::google::protobuf::Service *service){
+bool RpcServer::RegisterService(::google::protobuf::Service *service)
+{
     const google::protobuf::ServiceDescriptor *pSerDes = service->GetDescriptor();
 
     int methodCnt = pSerDes->method_count();
 
-    std::string serviceName = pSerDes->full_name();
+    string serviceName = pSerDes->full_name();
     serviceID serviceId = 1;
 
     ServiceData servicetmp;
@@ -59,7 +61,7 @@ void RpcServer::handleRpcCall(rpcDemo::RpcMessage req, rpcDemo::RpcMessage &res)
 
     rpc_service->CallMethod(this_method->m_descriptor, NULL, request, response, NULL);
 
-    std::string response_str;
+    string response_str;
     response->SerializeToString(&response_str);
 
     // 序列化了又
@@ -87,4 +89,65 @@ RpcServer::MethodData *RpcServer::GetMethod(uint32_t serviceId, uint32_t methodI
 void RpcServer::Start(int bindPort)
 {
     // TODO: 服务器请求
+    int hostfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+    epoll_event event, evClients[MAX_CLIENT];
+
+    int epollfd = epoll_create(1024);
+
+    event.data.fd = hostfd;
+    event.events = EPOLLIN | EPOLLET;
+
+    epoll_ctl(epollfd, EPOLL_CTL_ADD, hostfd, &event);
+
+    sockaddr_in sin;
+    sin.sin_family = AF_INET;
+    inet_pton(AF_INET, "0.0.0.0", &sin.sin_addr.s_addr);
+    sin.sin_port = htons(bindPort);
+    bind(hostfd, (const sockaddr *)&sin, sizeof(sin));
+    listen(hostfd, 20);
+
+    cout << "server start listen port:" << sin.sin_port << endl;
+
+    int eps = 0;
+    socklen_t length = 0;
+    while (true)
+    {
+        eps = epoll_wait(epollfd, evClients, MAX_CLIENT, -1);
+        for (int i = 0; i < eps; ++i)
+        {
+            if (evClients[i].data.fd == hostfd)
+            {
+                int fdNow = accept(hostfd, (sockaddr *)&sin, &length);
+                if (fdNow < 0)
+                {
+                    cerr << " fdNow < 0" << endl;
+                    continue;
+                }
+
+#ifdef DEBUG
+                char ip[16];
+                cout << "accept from: " << inet_ntop(AF_INET, &sin.sin_addr.s_addr, ip, sizeof(sin)) << ":" << sin.sin_port << endl;
+#endif
+
+                event.data.fd = fdNow;
+                event.events = EPOLLIN | EPOLLET;
+                fcntl(fdNow, F_SETFL, fcntl(fdNow, F_GETFL) | O_NONBLOCK);
+                epoll_ctl(epollfd, EPOLL_CTL_ADD, fdNow, &event);
+            }
+            else if (evClients[i].events & EPOLLIN)
+            {
+                int fd = evClients[i].data.fd;
+                if (fd < 0)
+                    continue;
+                thread worker([fd]()
+                              { httpProc(fd, ""); });
+
+                worker.detach();
+            }
+        }
+    }
+
+    // hostfd.
+    return;
 }
