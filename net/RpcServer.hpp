@@ -14,22 +14,6 @@
 #include <bits/stdc++.h>
 #include <google/protobuf/service.h>
 #include "RpcMessage.pb.h"
-
-typedef std::function<void(rpcDemo::RpcMessage, rpcDemo::RpcMessage &)> HandleRpcCallFunc;
-
-class RpcMsgService : public Service<rpcDemo::RpcMessage, rpcDemo::RpcMessage>
-{
-public:
-    /*RpcMsgService构造函数*/
-    RpcMsgService(HandleRpcCallFunc arg);
-
-    /*RpcMsgService调用流程*/
-    Future<rpcDemo::RpcMessage> operator()(rpcDemo::RpcMessage request) override;
-
-private:
-    // HandleRpcCallFunc _handleRpcCall; // RPC call function
-};
-
 class RpcServer
 {
     public:
@@ -51,8 +35,8 @@ class RpcServer
         /*注册服务*/
         bool RegisterService(::google::protobuf::Service *service);
 
-        /*启动RPC服务器*/
-        void Start(int bindPort);
+        // 启动RPC服务器 默认80
+        void Start(int bindPort = 80);
     private:
         /*根据serviceId获取service*/
         google::protobuf::Service *GetService(uint32_t serviceId);
@@ -61,21 +45,12 @@ class RpcServer
         MethodData *GetMethod(uint32_t serviceId, uint32_t methodId);
 
         /*根据RPC请求的serviceId和methodId取出相应的方法去执行并获取执行结果写回响应*/
-        void handleRpcCall(rpc::codec::RpcMessage req, rpc::codec::RpcMessage &res);
+        void handleRpcCall(rpcDemo::RpcMessage req, rpcDemo::RpcMessage &res);
 
         /*RPC服务方法调用map*/
         std::unordered_map<serviceID, ServiceData> _rpcCallMap;
-
         
-    public:
-        RpcServer(/* args */);
-        ~RpcServer();
+    // public:
+    //     RpcServer();
+    //     ~RpcServer();
 };
-
-RpcServer::RpcServer(/* args */)
-{
-}
-
-RpcServer::~RpcServer()
-{
-}

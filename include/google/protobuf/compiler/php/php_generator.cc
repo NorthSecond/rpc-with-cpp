@@ -490,9 +490,9 @@ std::string PhpSetterTypeName(const FieldDescriptor* field,
     // accommodate for edge case with multiple types.
     size_t start_pos = type.find("|");
     if (start_pos != std::string::npos) {
-      type.replace(start_pos, 1, "[]|");
+      type.replace(start_pos, 1, ">|array<");
     }
-    type += "[]|\\Google\\Protobuf\\Internal\\RepeatedField";
+    type = "array<" + type + ">|\\Google\\Protobuf\\Internal\\RepeatedField";
   }
   return type;
 }
@@ -1337,11 +1337,18 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
       "name", fullname);
   Indent(&printer);
 
+  bool hasReserved = false;
   for (int i = 0; i < en->value_count(); i++) {
     const EnumValueDescriptor* value = en->value(i);
     GenerateEnumValueDocComment(&printer, value);
+
+    std::string prefix = ConstantNamePrefix(value->name());
+    if (!prefix.empty()) {
+      hasReserved = true;
+    }
+
     printer.Print("const ^name^ = ^number^;\n",
-                  "name", ConstantNamePrefix(value->name()) + value->name(),
+                  "name", prefix + value->name(),
                   "number", IntToString(value->number()));
   }
 
@@ -1349,8 +1356,9 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
   Indent(&printer);
   for (int i = 0; i < en->value_count(); i++) {
     const EnumValueDescriptor* value = en->value(i);
-    printer.Print("self::^name^ => '^name^',\n",
-                  "name", ConstantNamePrefix(value->name()) + value->name());
+    printer.Print("self::^constant^ => '^name^',\n",
+                  "constant", ConstantNamePrefix(value->name()) + value->name(),
+                  "name", value->name());
   }
   Outdent(&printer);
   printer.Print("];\n");
@@ -1380,12 +1388,22 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
   printer.Print("$const = __CLASS__ . '::' . strtoupper($name);\n"
                 "if (!defined($const)) {\n");
   Indent(&printer);
+  if (hasReserved) {
+    printer.Print("$pbconst =  __CLASS__. '::PB' . strtoupper($name);\n"
+                "if (!defined($pbconst)) {\n");
+    Indent(&printer);
+  }
   printer.Print("throw new UnexpectedValueException(sprintf(\n");
   Indent(&printer);
   Indent(&printer);
   printer.Print("'Enum %s has no value defined for name %s', __CLASS__, $name));\n");
   Outdent(&printer);
   Outdent(&printer);
+  if (hasReserved) {
+    Outdent(&printer);
+    printer.Print("}\n"
+                  "return constant($pbconst);\n");
+  }
   Outdent(&printer);
   printer.Print("}\n"
                 "return constant($const);\n");

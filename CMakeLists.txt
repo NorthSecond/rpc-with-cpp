@@ -7,7 +7,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include
+protocoder
+util
+)
 include(CPack)
 
 add_subdirectory(example)
