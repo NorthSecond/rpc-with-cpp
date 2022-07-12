@@ -1,12 +1,11 @@
-syntax = "proto3"
-
-package rpcDemo
+syntax = "proto3";
+package rpcDemo;
 
 enum MsgType
 {
-    REQUEST = 1;
-    RESPONSE = 2;
-    ERROR = 3; 
+    REQUEST = 0;
+    RESPONSE = 1;
+    ERROR = 2; 
 }
 
 enum ErrorCode
@@ -28,8 +27,7 @@ message RpcMessage
     uint32 serviceId = 3;     //服务ID
     uint32 methodId  = 4;     //方法ID
 
-    optional bytes request    = 5;     //请求 protocol二进制编码
-    optional bytes response   = 6;     //响应 protocol二进制编码
-
-    optional ErrorCode error  = 7;     //错误码
+    bytes request    = 5;     //请求 protocol二进制编码
+    bytes response   = 6;     //响应 protocol二进制编码
+    ErrorCode error  = 7;     //错误码
 }
