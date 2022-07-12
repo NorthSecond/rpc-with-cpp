@@ -1,0 +1,35 @@
+syntax = "proto3"
+
+package rpcDemo
+
+enum MsgType
+{
+    REQUEST = 1;
+    RESPONSE = 2;
+    ERROR = 3; 
+}
+
+enum ErrorCode
+{
+    NO_ERROR = 0;        //正确响应
+    WRONG_PROTO = 1;     //协议错误
+    NO_SERVICE = 2;      //找不到服务
+    NO_METHOD = 3;       //找不到方法
+    INVALID_REQUEST = 4; //错误请求
+    INVALID_RESPONSE = 5;//错误响应
+    TIMEOUT = 6;         //请求超时
+    PENDDING_LIMIT = 7;  //达到最大pending请求限制
+}
+
+message RpcMessage
+{
+    MsgType type     = 1;     //消息类型
+    int64 id         = 2;     //请求id requiest_id 类http2.0的无序请求-响应
+    uint32 serviceId = 3;     //服务ID
+    uint32 methodId  = 4;     //方法ID
+
+    optional bytes request    = 5;     //请求 protocol二进制编码
+    optional bytes response   = 6;     //响应 protocol二进制编码
+
+    optional ErrorCode error  = 7;     //错误码
+}
