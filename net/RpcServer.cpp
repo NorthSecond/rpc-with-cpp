@@ -88,7 +88,6 @@ RpcServer::MethodData *RpcServer::GetMethod(uint32_t serviceId, uint32_t methodI
 //启动RPC服务器
 void RpcServer::Start(int bindPort)
 {
-    // TODO: 服务器请求
     int hostfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     epoll_event event, evClients[MAX_CLIENT];
@@ -103,7 +102,8 @@ void RpcServer::Start(int bindPort)
     sockaddr_in sin;
     sin.sin_family = AF_INET;
     inet_pton(AF_INET, "127.0.0.1", &sin.sin_addr.s_addr);
-    sin.sin_port = htons(bindPort);
+    // sin.sin_port = htons(bindPort);
+    sin.sin_port = bindPort;
     bind(hostfd, (const sockaddr *)&sin, sizeof(sin));
     listen(hostfd, 20);
 

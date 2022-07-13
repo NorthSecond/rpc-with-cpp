@@ -29,7 +29,7 @@ int main(int argc, const char** argv) {
 
     rpcExample::Service_Stub myService(&channel);
     int i = 0;
-    while(i++ < 10000){
+    while(i++ < 10){
         if(i % 2){
             rpcExample::request *req = new rpcExample::request();
             rpcExample::result *res = new rpcExample::result();
@@ -38,7 +38,7 @@ int main(int argc, const char** argv) {
             req->set_b(i);
 
             myService.Add(NULL, req, res, NULL);
-            printf("%d + %d = %d\n", req->a(), req->b(), res->c());
+            printf("%ld + %ld = %ld\n", req->a(), req->b(), res->c());
         }else{
             rpcExample::request *req = new rpcExample::request();
             rpcExample::result *res = new rpcExample::result();
@@ -47,7 +47,7 @@ int main(int argc, const char** argv) {
             req->set_b(i / 2);
 
             myService.Sub(NULL, req, res, NULL);
-            printf("%d - %d = %d\n", req->a(), req->b(), res->c());
+            printf("%ld - %ld = %ld\n", req->a(), req->b(), res->c());
         }
     }
     return 0;

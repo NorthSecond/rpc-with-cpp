@@ -27,6 +27,10 @@ RpcClient::RpcClient(std::string host, int port)
     socketfd = -1;
 }
 
+RpcClient::~RpcClient(){
+    close(socketfd);
+}
+
 bool RpcClient::myConnect(){
     struct sockaddr_in servaddr;
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -36,7 +40,8 @@ bool RpcClient::myConnect(){
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     inet_pton(AF_INET, host.c_str(), &servaddr.sin_addr);
-    servaddr.sin_port = htons(port);
+    // servaddr.sin_port = htons(port);
+    servaddr.sin_port = port;
     if (-1 == connect(socketfd, (struct sockaddr *)&servaddr, sizeof(servaddr)))
     {
         printf("Connect error(%d): %s\n", errno, strerror(errno));
@@ -93,10 +98,11 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, go
     
     // TODO: 实现同步和异步调用
     char buffer[1024];
+
     if (done)
     {
+        thread worker([response ,this, Req, buffer, done]() {
         rpcDemo::RpcMessage Res;
-        thread worker([Res,response ,this, Req, buffer, done]() {
         string str = "";
         Req.SerializeToString(&str);
         httpSender(rpcClient->socketfd, str);
@@ -104,7 +110,7 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, go
         string tmpStr = string(buffer);
         int index = tmpStr.find("\r\n\r\n");
         tmpStr = tmpStr.substr(index + 4);
-        // Res.ParseFromString(tmpStr);
+        Res.ParseFromString(tmpStr);
         response->ParseFromString(Res.response());
         done->Run();
         });
