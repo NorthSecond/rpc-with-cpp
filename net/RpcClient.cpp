@@ -96,11 +96,11 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, go
     request->SerializeToString(&request_str);
     Req.set_request(std::move(request_str));
     
-    // TODO: 实现同步和异步调用
     char buffer[1024];
 
     if (done)
     {
+        // 异步调用
         thread worker([response ,this, Req, buffer, done]() {
         rpcDemo::RpcMessage Res;
         string str = "";
@@ -114,7 +114,7 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, go
         response->ParseFromString(Res.response());
         done->Run();
         });
-        // 异步调用
+        worker.detach();
     }
     else
     {

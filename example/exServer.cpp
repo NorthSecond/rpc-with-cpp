@@ -25,7 +25,7 @@ public:
     {
         response->set_c(request->a() + request->b());
 
-        cout << "RPC Server Called MyService::Add()  " << callCount++ << endl;
+        // cout << "RPC Server Called MyService::Add()  " << callCount++ << endl;
 
         if (done)
             done->Run();
@@ -35,7 +35,7 @@ public:
     {
         response->set_c(request->a() - request->b());
 
-        cout << "RPC Server Called MyService::Sub()  " << callCount++ << endl;
+        // cout << "RPC Server Called MyService::Sub()  " << callCount++ << endl;
 
         if (done)
             done->Run();

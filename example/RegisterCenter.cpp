@@ -136,7 +136,7 @@ int main(void)
                     SkipNode<HostMessage> *resNode = server.ServerList.find(res);
                     HostMessage msg = resNode->value;
                     bzero(buffer, 127);
-                    sprintf(buffer, "%s %d", msg.Hostname, msg.port);
+                    sprintf(buffer, "%s %d", msg.Hostname.c_str(), msg.port);
                     send(fd, buffer, strlen(buffer), 0);
                 }
                 close(fd);

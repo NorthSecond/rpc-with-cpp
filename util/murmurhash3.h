@@ -20,4 +20,4 @@
  * http://murmurhash.googlepages.com/
  * 参数seed：种子，最好用一个质数
  */
-uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed = 17);
+uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed = 17U);
