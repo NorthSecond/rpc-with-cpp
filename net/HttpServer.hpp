@@ -59,3 +59,5 @@ private:
 };
 
 void httpProc(int fd, std::string body);
+
+std::string const parserHttp(int fd);

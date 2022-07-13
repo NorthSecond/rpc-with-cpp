@@ -102,7 +102,7 @@ void RpcServer::Start(int bindPort)
 
     sockaddr_in sin;
     sin.sin_family = AF_INET;
-    inet_pton(AF_INET, "0.0.0.0", &sin.sin_addr.s_addr);
+    inet_pton(AF_INET, "127.0.0.1", &sin.sin_addr.s_addr);
     sin.sin_port = htons(bindPort);
     bind(hostfd, (const sockaddr *)&sin, sizeof(sin));
     listen(hostfd, 20);
@@ -140,8 +140,16 @@ void RpcServer::Start(int bindPort)
                 int fd = evClients[i].data.fd;
                 if (fd < 0)
                     continue;
-                thread worker([fd]()
-                              { httpProc(fd, ""); });
+                thread worker([fd, this]()
+                              { 
+                                // 异步处理fd
+                                string req = parserHttp(fd);
+                                rpcDemo::RpcMessage request;
+                                request.ParseFromString(req);
+                                rpcDemo::RpcMessage res;
+                                handleRpcCall(request, res);
+                                httpProc(fd, res.SerializeAsString()); 
+                                });
 
                 worker.detach();
             }

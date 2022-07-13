@@ -39,13 +39,11 @@ RpcChannel::~RpcChannel()
 void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, google::protobuf::RpcController *controller, const google::protobuf::Message *request, google::protobuf::Message *response, google::protobuf::Closure *done)
 {
 
-    // if (!rpcClient->connected.load())
-    // {
-    //     std::unique_lock<std::mutex>(this->connect_mu);
-    //     rpcClient->pipeline = rpcClient->tcpClient.connect(rpcClient->remoteAddress).get();
-    //     rpcClient->dispatcher->setPipeline(rpcClient->pipeline);
-    //     rpcClient->connected = true;
-    // }
+    while (!rpcClient->connected.load())
+    {
+        std::unique_lock<std::mutex>(this->connect_mu);
+        rpcClient->connected = rpcClient->connect();
+    }
 
     //获取service id 进行farmhash运算 将service name 转为 uint32
     std::string serviceName = method->service()->full_name();
@@ -62,5 +60,13 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, go
     Req.set_request(std::move(request_str));
 
     // TODO: 实现同步和异步调用
-    
+    rpcDemo::RpcMessage Res;
+    if(done){
+
+        done->Run();
+    }
+    else
+    {
+        response->ParseFromString(Res.response());
+    }
 }

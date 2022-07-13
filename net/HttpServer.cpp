@@ -122,15 +122,6 @@ std::string HttpParser::readn(int max)
 
 void httpProc(int fd, std::string body)
 {
-    HttpParser req;
-    req.setSocket(fd);
-    req.parse();
-
-    for (auto &headerName : req.headerNames())
-    {
-        std::cout << headerName << ": " << req.header(headerName) << std::endl;
-    }
-
     std::string fmt =
         "HTTP/1.1 200 OK \r\n"
         "Server: nginx\r\n"
@@ -149,4 +140,12 @@ void httpProc(int fd, std::string body)
     send(fd, res, size, 0);
 
     close(fd);
+}
+
+std::string const parserHttp(int fd){
+    HttpParser req;
+    req.setSocket(fd);
+    req.parse();
+
+    return req.body();
 }

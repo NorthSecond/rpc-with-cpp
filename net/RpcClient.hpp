@@ -22,10 +22,19 @@ using namespace std;
  */
 class RpcClient
 {
-private:
-    /* data */
 public:
 
+    RpcClient(std::string host, int port);
+    ~RpcClient();
+
+public:
+
+    std::atomic_bool connected;
+    bool connect();
+
+private:
+    string host;
+    int32_t port;
 };
 
 /*
