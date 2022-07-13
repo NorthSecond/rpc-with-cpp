@@ -15,5 +15,5 @@ message result
 
 service Service{
     rpc Add (request) returns (result);
-    rpc sub (request) returns (result);
+    rpc Sub (request) returns (result);
 }

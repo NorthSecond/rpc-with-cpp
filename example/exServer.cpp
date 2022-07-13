@@ -20,13 +20,9 @@ class ServiceImpl : public rpcExample::Service {
 public:
     ServiceImpl() : callCount(0L) {}
     /* 实现 MyService::Add() 方法 */
-    void Add(::google::protobuf::RpcController *controller, const ::rpcExample::OperaReq *request,
-             ::rpcExample::OperaRes *response, ::google::protobuf::Closure *done) override
+    void Add(::google::protobuf::RpcController *controller, const ::rpcExample::request *request,
+             ::rpcExample::result *response, ::google::protobuf::Closure *done) override
     {
-
-        //模拟后端服务执行时间
-        // this_thread::sleep_for(std::chrono::milliseconds(50));
-
         response->set_c(request->a() + request->b());
 
         cout << "RPC Server Called MyService::Add()  " << callCount++ << endl;
@@ -35,8 +31,7 @@ public:
             done->Run();
     }
 
-    void Sub(::google::protobuf::RpcController *controller, const ::rpcExample::OperaReq *request,
-             ::rpcExample::OperaRes *response, ::google::protobuf::Closure *done) override
+    void Sub(::google::protobuf::RpcController *controller, const ::rpcExample::request *request, ::rpcExample::result *response, ::google::protobuf::Closure *done) override
     {
         response->set_c(request->a() - request->b());
 
@@ -59,7 +54,7 @@ int main(int argc, char const *argv[])
     server.RegisterService(impl);
     int port;
     if(argc < 2){
-        port = 80;
+        port = 8080;
     }else{
         port = atoi(argv[1]);
     }
