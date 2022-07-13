@@ -10,4 +10,6 @@
  */
 
 # pragma once
+# include "HttpParser.hpp"
 
+bool httpSender(int fd, std::string fill);

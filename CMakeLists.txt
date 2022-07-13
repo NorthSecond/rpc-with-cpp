@@ -1,47 +1,37 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(rpc-with-cpp VERSION 0.1.0)
 
-# include(CTest)
-# enable_testing()
 set(CMAKE_CXX_STANDARD 17)
-
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include_directories(${PROJECT_SOURCE_DIR}/include
-protocoder
-util
-)
+
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/bin)
+
+set(PROTOBUF_DIR ${PROJECT_SOURCE_DIR}/include)
 include(CPack)
+
+
+include_directories(
+        ${PROJECT_SOURCE_DIR}
+        ${PROTOBUF_DIR}
+        ${PROJECT_SOURCE_DIR}/protocoder
+)
 
 add_subdirectory(example)
 
-add_library( myrpc
-    net/RpcClient.hpp
-    net/RpcServer.hpp
-    net/RpcRegisterCenter.hpp
-    util/skipList.hpp
-    protocoder/RpcMessage.pb.h
-    net/RpcClient.cpp
-    net/RpcServer.cpp
-    net/RpcRegisterCenter.cpp
-    util/skipList.cpp
-    protocoder/RpcMessage.pb.cc
+set(SRC_LIB
+        ${PROJECT_SOURCE_DIR}/net/HttpClient.cpp
+        ${PROJECT_SOURCE_DIR}/net/RpcServer.cpp
+        ${PROJECT_SOURCE_DIR}/net/RpcClient.cpp
+        ${PROJECT_SOURCE_DIR}/net/HttpServer.cpp
+        ${PROJECT_SOURCE_DIR}/net/HttpParser.cpp
+        ${PROJECT_SOURCE_DIR}/protocoder/RpcMessage.pb.cc
+        ${PROJECT_SOURCE_DIR}/util/consistent_hash.cpp
+        ${PROJECT_SOURCE_DIR}/util/murmurhash.cpp
+        ${PROJECT_SOURCE_DIR}/util/skipList.cpp
 )
 
-INSTALL(
-        TARGETS myrpc
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION libstatic
-)
+link_directories(${PROJECT_SOURCE_DIR})
+add_library(Rpc-Lib ${SRC_LIB})
 
-INSTALL(
-        FILES
-        net/RpcClient.hpp
-        net/RpcServer.hpp
-        net/RpcRegisterCenter.hpp
-        util/skipList.hpp
-        protocoder/RpcMessage.pb.h
-
-        DESTINATION include
-)

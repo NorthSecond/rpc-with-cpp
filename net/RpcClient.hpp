@@ -13,7 +13,8 @@
 
 #include <bits/stdc++.h>
 #include <google/protobuf/service.h>
-#include "RpcMessage.pb.h"
+#include "protocoder/RpcMessage.pb.h"
+#include "HttpClient.hpp"
 
 using namespace std;
 
@@ -30,9 +31,11 @@ public:
 public:
 
     std::atomic_bool connected;
-    bool connect();
+    bool myConnect();
+    int socketfd;
 
 private:
+    char buffer[1055];
     string host;
     int32_t port;
 };
@@ -61,6 +64,6 @@ private:
     //请求id
     std::atomic_long request_id;
 
-    //互斥锁
-    std::mutex connect_mu;
+    // //互斥锁
+    // std::mutex connect_mu;
 };

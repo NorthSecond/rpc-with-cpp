@@ -10,7 +10,7 @@
  */
 
 #include "RpcServer.hpp"
-#include "murmurhash3.h"
+#include "util/murmurhash3.h"
 #include "HttpServer.hpp"
 
 using namespace std;

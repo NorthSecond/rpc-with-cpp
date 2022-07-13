@@ -9,8 +9,41 @@
  *
  */
 
+#include <sys/socket.h>
+#include <sys/unistd.h>
+#include <sys/types.h>
+#include <sys/errno.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include "RpcClient.hpp"
-#include "murmurhash3.h"
+#include "util/murmurhash3.h"
+
+RpcClient::RpcClient(std::string host, int port)
+{
+    this->host = host;
+    this->port = port;
+    connected = false;
+    socketfd = -1;
+}
+
+bool RpcClient::myConnect(){
+    struct sockaddr_in servaddr;
+    socketfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(-1 == socketfd){
+        return false;
+    }
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    inet_pton(AF_INET, host.c_str(), &servaddr.sin_addr);
+    servaddr.sin_port = htons(port);
+    if (-1 == connect(socketfd, (struct sockaddr *)&servaddr, sizeof(servaddr)))
+    {
+        printf("Connect error(%d): %s\n", errno, strerror(errno));
+        return false;
+    }
+    return true;
+}
 
 /*
  * RpcChannel
@@ -41,8 +74,7 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, go
 
     while (!rpcClient->connected.load())
     {
-        std::unique_lock<std::mutex>(this->connect_mu);
-        rpcClient->connected = rpcClient->connect();
+        rpcClient->connected = rpcClient->myConnect();
     }
 
     //获取service id 进行farmhash运算 将service name 转为 uint32
@@ -58,15 +90,38 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor *method, go
     std::string request_str;
     request->SerializeToString(&request_str);
     Req.set_request(std::move(request_str));
-
+    
     // TODO: 实现同步和异步调用
-    rpcDemo::RpcMessage Res;
-    if(done){
-
+    char buffer[1024];
+    if (done)
+    {
+        rpcDemo::RpcMessage Res;
+        thread worker([Res,response ,this, Req, buffer, done]() {
+        string str = "";
+        Req.SerializeToString(&str);
+        httpSender(rpcClient->socketfd, str);
+        recv(rpcClient->socketfd, (void*) buffer, 1023, 0);
+        string tmpStr = string(buffer);
+        int index = tmpStr.find("\r\n\r\n");
+        tmpStr = tmpStr.substr(index + 4);
+        // Res.ParseFromString(tmpStr);
+        response->ParseFromString(Res.response());
         done->Run();
+        });
+        // 异步调用
     }
     else
     {
+        rpcDemo::RpcMessage Res;
+        // 同步调用
+        string str = "";
+        Req.SerializeToString(&str);
+        httpSender(rpcClient->socketfd, str);
+        recv(rpcClient->socketfd, buffer, 1023, 0);
+        string tmpStr = string(buffer);
+        int index = tmpStr.find("\r\n\r\n");
+        tmpStr = tmpStr.substr(index + 4);
+        Res.ParseFromString(tmpStr);
         response->ParseFromString(Res.response());
     }
 }
