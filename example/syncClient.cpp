@@ -29,7 +29,7 @@ int main(int argc, const char** argv) {
 
     rpcExample::Service_Stub myService(&channel);
     int i = 0;
-    while(i++ < 10){
+    while(i++ < 1e6){
         if(i % 2){
             rpcExample::request *req = new rpcExample::request();
             rpcExample::result *res = new rpcExample::result();
