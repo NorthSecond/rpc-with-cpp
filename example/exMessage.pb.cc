@@ -84,7 +84,7 @@ const char descriptor_table_protodef_exMessage_2eproto[] PROTOBUF_SECTION_VARIAB
   "\n\017exMessage.proto\022\nrpcExample\"\037\n\007request"
   "\022\t\n\001a\030\001 \001(\003\022\t\n\001b\030\002 \001(\003\"\023\n\006result\022\t\n\001c\030\001 "
   "\001(\0032i\n\007Service\022.\n\003Add\022\023.rpcExample.reque"
-  "st\032\022.rpcExample.result\022.\n\003sub\022\023.rpcExamp"
+  "st\032\022.rpcExample.result\022.\n\003Sub\022\023.rpcExamp"
   "le.request\032\022.rpcExample.resultB\003\200\001\001b\006pro"
   "to3"
   ;
@@ -515,11 +515,11 @@ void Service::Add(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
   done->Run();
 }
 
-void Service::sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+void Service::Sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
                          const ::rpcExample::request*,
                          ::rpcExample::result*,
                          ::google::protobuf::Closure* done) {
-  controller->SetFailed("Method sub() not implemented.");
+  controller->SetFailed("Method Sub() not implemented.");
   done->Run();
 }
 
@@ -539,7 +539,7 @@ void Service::CallMethod(const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method
              done);
       break;
     case 1:
-      sub(controller,
+      Sub(controller,
              ::PROTOBUF_NAMESPACE_ID::internal::DownCast<const ::rpcExample::request*>(
                  request),
              ::PROTOBUF_NAMESPACE_ID::internal::DownCast<::rpcExample::result*>(
@@ -600,7 +600,7 @@ void Service_Stub::Add(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
   channel_->CallMethod(descriptor()->method(0),
                        controller, request, response, done);
 }
-void Service_Stub::sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+void Service_Stub::Sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
                               const ::rpcExample::request* request,
                               ::rpcExample::result* response,
                               ::google::protobuf::Closure* done) {

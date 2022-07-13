@@ -385,7 +385,7 @@ class Service : public ::PROTOBUF_NAMESPACE_ID::Service {
                        const ::rpcExample::request* request,
                        ::rpcExample::result* response,
                        ::google::protobuf::Closure* done);
-  virtual void sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+  virtual void Sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
                        const ::rpcExample::request* request,
                        ::rpcExample::result* response,
                        ::google::protobuf::Closure* done);
@@ -422,7 +422,7 @@ class Service_Stub : public Service {
                        const ::rpcExample::request* request,
                        ::rpcExample::result* response,
                        ::google::protobuf::Closure* done);
-  void sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
+  void Sub(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
                        const ::rpcExample::request* request,
                        ::rpcExample::result* response,
                        ::google::protobuf::Closure* done);
