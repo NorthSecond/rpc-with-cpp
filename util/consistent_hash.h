@@ -1,6 +1,6 @@
 /**
  * @file consistent_hash.hpp
- * @author your name (you@domain.com)
+ * @author yangyf83 (yangyf83@mail2.sysu.edu.cn)
  * @brief 一致性哈希算法
  * @version 0.1
  * @date 2022-07-12

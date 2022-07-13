@@ -1,6 +1,6 @@
 /**
  * @file murmurhash3.h
- * @author your name (you@domain.com)
+ * @author yangyf83 (yangyf83@mail2.sysu.edu.cn)
  * @brief 
  * @version 0.1
  * @date 2022-07-12
