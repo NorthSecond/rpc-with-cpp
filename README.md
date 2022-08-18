@@ -1,6 +1,6 @@
 # RPC with CPP
 
-<p align = "center"> 杨翼飞 20303068 </p>
+<p align = "center"> yangyf83@amail2.sysu.edu.cn </p>
 
 ## 项目简介
 
